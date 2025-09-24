@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conversor DBC → Excel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>Conversor DBC → Excel</h1>
+        <p>Converta arquivos .dbc (Datasus) em Excel (.xlsx).</p>
+        <p class="credit">
+          <small>Desenvolvido por 
+            <a href="https://www.linkedin.com/in/elivansilva" target="_blank" rel="noopener">
+              <strong>Elivan Silva</strong>
+            </a>.
+          </small>
+        </p>
+      </header>
+
+      <section class="card">
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Área para soltar arquivo DBC">
+          <div class="dz-inner">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <strong>Arraste e solte</strong> seu arquivo .dbc aqui
+            </div>
+            <div class="muted">ou</div>
+            <label class="btn">
+              Escolher arquivo
+              <input id="fileInput" type="file" accept=".dbc" hidden />
+            </label>
+          </div>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden"></div>
+
+        <div id="progressWrap" class="progress-wrap hidden" aria-live="polite">
+          <div class="progress">
+            <div id="progressBar" class="progress-bar" style="width:0%"></div>
+          </div>
+          <div class="progress-text">
+            <span id="progressLabel">0%</span>
+            <span id="statusLabel"></span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="convertBtn" class="btn primary" disabled>Converter para Excel</button>
+          <button id="clearBtn" class="btn ghost" disabled>Limpar</button>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>
+          Acesse o GitHub e contribua com o projeto 
+          (<a href="https://github.com/elivansouza" target="_blank" rel="noopener">github.com/elivansouza</a>).
+        </span>
+      </footer>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+  </html>
+
+
