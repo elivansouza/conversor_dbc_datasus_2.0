@@ -14,9 +14,11 @@ Programa local (Windows e macOS) para converter arquivos `.dbc` do Datasus em `.
 
 ## 🚀 Execução Rápida (usuário final)
 
-Baixe o executável mais recente na seção de builds do projeto:
-- **Windows**: extraia o zip e execute `ConversorDBC.exe`
+Baixe o instalador mais recente na seção de builds do projeto:
+- **Windows**: baixe e execute `ConversorDBC-Setup.exe` (instalador único, gerado com Inno Setup) e siga o assistente
 - **macOS (Apple Silicon)**: extraia o `.app` e abra normalmente
+
+> ⚠️ **Windows**: instale sempre pelo `ConversorDBC-Setup.exe`. O artefato `ConversorDBC-windows` (pasta com `ConversorDBC.exe` + `_internal/`) é para quem for testar localmente — se você copiar só o `.exe` sem a pasta `_internal` ao lado, o programa não abre (erro "Failed to load Python DLL").
 
 Na primeira execução o sistema operacional pode exibir um aviso padrão de "aplicativo não reconhecido" (SmartScreen no Windows / Gatekeeper no macOS) por o programa ainda não ter assinatura de código paga — não é um bloqueio de antivírus, apenas clique em "Executar mesmo assim" / "Abrir mesmo assim".
 
@@ -64,6 +66,14 @@ pyinstaller packaging/windows.spec --noconfirm --clean
 # macOS (Apple Silicon)
 pyinstaller packaging/macos.spec --noconfirm --clean
 ```
+
+No Windows, gere também o instalador único (requer [Inno Setup](https://jrsoftware.org/isinfo.php) instalado):
+
+```powershell
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging\inno_setup.iss
+```
+
+O resultado fica em `dist\installer\ConversorDBC-Setup.exe` — é esse arquivo que deve ser distribuído (nunca o `ConversorDBC.exe` sozinho).
 
 O workflow `.github/workflows/build-desktop.yml` automatiza os dois builds (Windows + macOS) via GitHub Actions, disparado manualmente ou ao criar uma tag `v*`.
 
