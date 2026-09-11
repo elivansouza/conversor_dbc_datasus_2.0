@@ -1,26 +1,16 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 import os
+import sys
 import io
 import tempfile
 from datetime import datetime
 
-from .converter_clean import convert_dbc_to_excel
+from .converter import convert_dbc_to_excel, ConversaoError
 
 
 app = FastAPI(title="DBC to Excel Converter", version="1.0.0")
-
-
-# Permite acesso do front-end (ajuste ALLOW_ORIGINS em producao se desejar)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 @app.post("/convert")
@@ -54,8 +44,15 @@ async def convert(file: UploadFile = File(...)):
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             headers=headers,
         )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Falha na conversao: {exc}")
+    except ConversaoError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="Ocorreu um erro inesperado ao converter o arquivo. Tente novamente.",
+        )
     finally:
         try:
             if 'tmp_in_path' in locals() and os.path.exists(tmp_in_path):
@@ -69,8 +66,15 @@ async def health():
     return {"status": "ok"}
 
 
+def _static_dir() -> str:
+    """Resolve o diretorio de estaticos tanto em dev quanto empacotado (PyInstaller onedir)."""
+    if getattr(sys, "frozen", False):
+        return os.path.join(os.path.dirname(sys.executable), "app", "static")
+    return os.path.join(os.path.dirname(__file__), "static")
+
+
 # Mount static files AFTER API routes
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+static_dir = _static_dir()
 if os.path.isdir(static_dir):
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
