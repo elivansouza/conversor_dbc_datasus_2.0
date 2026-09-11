@@ -5,7 +5,7 @@
 # de reducao de falso-positivo de antivirus descritos em windows.spec.
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(SPECPATH).resolve().parent
 STATIC_DIR = ROOT / "app" / "static"
 ICON_PATH = ROOT / "packaging" / "icon.icns"
 

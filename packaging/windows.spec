@@ -8,7 +8,7 @@
 # - console=False: nao abre janela de terminal (app grafico).
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(SPECPATH).resolve().parent
 STATIC_DIR = ROOT / "app" / "static"
 ICON_PATH = ROOT / "packaging" / "icon.ico"
 VERSION_FILE = ROOT / "packaging" / "version_info.txt"

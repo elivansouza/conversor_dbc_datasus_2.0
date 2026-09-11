@@ -67,9 +67,13 @@ async def health():
 
 
 def _static_dir() -> str:
-    """Resolve o diretorio de estaticos tanto em dev quanto empacotado (PyInstaller onedir)."""
+    """Resolve o diretorio de estaticos tanto em dev quanto empacotado (PyInstaller).
+
+    sys._MEIPASS aponta para o diretorio de dados bundled tanto em onefile
+    (pasta temp extraida) quanto em onedir (pasta `_internal` ao lado do exe).
+    """
     if getattr(sys, "frozen", False):
-        return os.path.join(os.path.dirname(sys.executable), "app", "static")
+        return os.path.join(getattr(sys, "_MEIPASS", os.path.dirname(sys.executable)), "app", "static")
     return os.path.join(os.path.dirname(__file__), "static")
 
 
