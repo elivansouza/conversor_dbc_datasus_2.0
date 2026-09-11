@@ -33,6 +33,49 @@
     }
   }
 
+  function blobToBase64(blob){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onloadend = ()=> resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function saveBlob(blob, filename){
+    const nativeApi = window.pywebview && window.pywebview.api && window.pywebview.api.save_file;
+
+    if(nativeApi){
+      try{
+        const base64 = await blobToBase64(blob);
+        const result = await window.pywebview.api.save_file(filename, base64);
+        if(result && result.ok){
+          statusLabel.textContent = 'Arquivo salvo com sucesso.';
+        } else if(result && result.error){
+          statusLabel.textContent = 'Falha ao salvar.';
+          alert('Falha ao salvar arquivo: ' + result.error);
+        } else {
+          statusLabel.textContent = 'Cancelado.';
+        }
+      }catch(err){
+        statusLabel.textContent = 'Falha ao salvar.';
+        alert('Falha ao salvar o arquivo.');
+      }
+      return;
+    }
+
+    // Fallback (navegador comum / modo Docker): download via blob-URL
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 0);
+    statusLabel.textContent = 'Concluído';
+  }
+
   function resetProgress(){
     progressBar.style.width = '0%';
     progressLabel.textContent = '0%';
@@ -86,17 +129,7 @@
         const match = disposition.match(/filename="?([^";]+)"?/i);
         if(match && match[1]){ filename = match[1]; }
 
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(()=> URL.revokeObjectURL(url), 0);
-
-        statusLabel.textContent = 'Concluído';
-        convertBtn.disabled = false;
+        saveBlob(blob, filename).finally(()=>{ convertBtn.disabled = false; });
       } else {
         let errorMessage = 'Falha na conversão';
         try{
