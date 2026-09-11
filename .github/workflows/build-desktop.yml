@@ -1,0 +1,42 @@
+name: build-desktop
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            spec: packaging/windows.spec
+            artifact: ConversorDBC-windows
+            dist_path: dist/ConversorDBC
+          - os: macos-latest
+            spec: packaging/macos.spec
+            artifact: ConversorDBC-macos-arm64
+            dist_path: dist/ConversorDBC.app
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller pyinstaller-hooks-contrib
+
+      - name: Build com PyInstaller
+        run: pyinstaller ${{ matrix.spec }} --noconfirm --clean
+
+      - name: Publicar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.dist_path }}
